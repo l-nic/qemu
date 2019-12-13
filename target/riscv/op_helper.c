@@ -23,6 +23,7 @@
 #include "qemu/main-loop.h"
 #include "exec/exec-all.h"
 #include "exec/helper-proto.h"
+#include "nic_interface.h"
 
 #ifndef CONFIG_USER_ONLY
 
@@ -369,6 +370,31 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
        pmpaddr_csr_write(env, csrno - CSR_PMPADDR0, val_to_write);
        break;
 #endif
+    case CSR_LOWNID:
+      lnic_set_own_port_id(val_to_write);
+      break;
+    case CSR_LREAD:
+    case CSR_LMSGSRDY:
+    case CSR_LRDEND:
+    case CSR_LRDSRCIPLO:
+    case CSR_LRDSRCIPHI:
+    case CSR_LRDSRCPRT:
+      break;
+    case CSR_LWRITE:
+      lnic_store_uint64(val_to_write);
+      break;
+    case CSR_LWREND:
+      lnic_write_message_end();
+      break;
+    case CSR_LWRDSTIPLO:
+      lnic_set_dst_ip_lower(val_to_write);
+      break;
+    case CSR_LWRDSTIPHI:
+      lnic_set_dst_ip_upper(val_to_write);
+      break;
+    case CSR_LWRDSTPRT:
+      lnic_set_dst_port(val_to_write);
+      break;
 #if !defined(CONFIG_USER_ONLY)
     do_illegal:
 #endif
@@ -601,6 +627,26 @@ target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
     case CSR_PMPADDR15:
        return pmpaddr_csr_read(env, csrno - CSR_PMPADDR0);
 #endif
+    case CSR_LOWNID:
+      return lnic_get_port_id();
+    case CSR_LREAD:
+      return lnic_load_uint64();
+    case CSR_LMSGSRDY:
+      return lnic_num_messages_ready();
+    case CSR_LRDEND:
+      return lnic_is_last_word_read();
+    case CSR_LRDSRCIPLO:
+      return lnic_read_src_ip_lower();
+    case CSR_LRDSRCIPHI:
+      return lnic_read_src_ip_upper();
+    case CSR_LRDSRCPRT:
+      return lnic_read_src_port();
+    case CSR_LWRITE:
+    case CSR_LWREND:
+    case CSR_LWRDSTIPLO:
+    case CSR_LWRDSTIPHI:
+    case CSR_LWRDSTPRT:
+      return 0;
     }
     /* used by e.g. MTIME read */
     do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());

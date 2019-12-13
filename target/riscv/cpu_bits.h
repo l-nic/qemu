@@ -241,6 +241,19 @@
 #define CSR_MHPMCOUNTER30H 0xb9e
 #define CSR_MHPMCOUNTER31H 0xb9f
 
+#define CSR_LOWNID 0x50
+#define CSR_LREAD 0x51
+#define CSR_LMSGSRDY 0x52
+#define CSR_LRDEND 0x53
+#define CSR_LRDSRCIPLO 0x54
+#define CSR_LRDSRCIPHI 0x55
+#define CSR_LRDSRCPRT 0x56
+#define CSR_LWRITE 0x57
+#define CSR_LWREND 0x58
+#define CSR_LWRDSTIPLO 0x59
+#define CSR_LWRDSTIPHI 0x5a
+#define CSR_LWRDSTPRT 0x5b
+
 /* mstatus bits */
 #define MSTATUS_UIE         0x00000001
 #define MSTATUS_SIE         0x00000002
