@@ -18,6 +18,8 @@
 
 #include "nic.h"
 
+extern uint64_t lnic_software_thread_id;
+
 using namespace std;
 
 nic_t::nic_t() {
@@ -71,15 +73,15 @@ void nic_t::set_own_port_id(uint64_t attempted_port_id) {
 		// ID 0 is reserved, allows reading own id from same csr
 		return;
 	}
-	// Don't do anything yet, the port id can only be 1 for now
-	_write_message[1].per_message_data.src_port_id = 1;
+	// TODO: No protection yet to prevent binding of multiple things to the same port
+	_write_message[attempted_port_id].per_message_data.src_port_id = attempted_port_id;
 }
 
 uint64_t nic_t::get_port_id() {
 	if (!_enable) {
 		return 0;
 	}
-	return 1; // TODO: Will eventually do a port id lookup based on the thread
+	return lnic_software_thread_id;
 }
 
 // ***********************************************
